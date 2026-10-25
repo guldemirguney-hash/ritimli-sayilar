@@ -7,7 +7,7 @@ import { Play } from './components/Play';
 import { Progress } from './components/Progress';
 import { TabBar, type Tab } from './components/TabBar';
 import { lastStop } from './lib/counter';
-import { currentUser, getProfile, LESSON_STEPS, logout, saveProfile, type Profile } from './lib/store';
+import { currentUser, getProfile, lessonCount, logout, saveProfile, type Profile } from './lib/store';
 
 type View = { kind: 'tab'; tab: Tab } | { kind: 'lesson'; step: number } | { kind: 'journey'; step: number } | { kind: 'play'; step: number | null };
 
@@ -30,7 +30,6 @@ export default function App() {
     setUser(null);
   };
 
-  const mod = (s: number) => profile.mods[s] ?? { lesson: 0, best: 0 };
   const patch = (s: number, fn: (m: { lesson: number; best: number }) => { lesson: number; best: number }, bonus: (before: { lesson: number; best: number }, after: { lesson: number; best: number }) => number) =>
     setProfile((p) => {
       const before = p.mods[s] ?? { lesson: 0, best: 0 };
@@ -46,7 +45,7 @@ export default function App() {
       <Lesson
         step={s}
         onBack={() => setView({ kind: 'tab', tab: 'learn' })}
-        onProgress={(n) => patch(s, (m) => ({ ...m, lesson: Math.max(m.lesson, n) }), (b, a) => (b.lesson < LESSON_STEPS && a.lesson >= LESSON_STEPS ? 2 : 0))}
+        onProgress={(n) => patch(s, (m) => ({ ...m, lesson: Math.max(m.lesson, n) }), (b, a) => (b.lesson < lessonCount(s) && a.lesson >= lessonCount(s) ? 2 : 0))}
         onJourney={() => setView({ kind: 'journey', step: s })}
       />
     );
@@ -75,7 +74,7 @@ export default function App() {
   return (
     <div className="app">
       <div className="content">
-        {tab === 'learn' && <Learn name={user} profile={profile} onPick={(s) => { mod(s); setView({ kind: 'lesson', step: s }); }} />}
+        {tab === 'learn' && <Learn name={user} profile={profile} onPick={(s) => setView({ kind: 'lesson', step: s })} onMix={() => setView({ kind: 'play', step: null })} />}
         {tab === 'play' && (
           <main className="screen center">
             <h1 className="big">Hazır mısın?</h1>

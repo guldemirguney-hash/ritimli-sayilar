@@ -5,8 +5,21 @@ export const SUFFIX: Record<number, string> = {
   2: "2'şer", 3: "3'er", 4: "4'er", 5: "5'er", 6: "6'şar", 7: "7'şer", 10: "10'ar",
 };
 
-/** Türkçe sesli okuma (varsa). Sayıları sırayla söyler. */
-export function speak(text: string) {
+const PRAISE = ['Aferin!', 'İyi iş!', 'Süpersin!', 'Harika!', 'Bravo!', 'Çok güzel!'];
+export function praise(): string {
+  return PRAISE[Math.floor(Math.random() * PRAISE.length)];
+}
+
+export function isMuted(): boolean {
+  try { return localStorage.getItem('rs.muted') === '1'; } catch { return false; }
+}
+export function setMuted(m: boolean) {
+  try { localStorage.setItem('rs.muted', m ? '1' : '0'); } catch { /* yok say */ }
+}
+
+/** Türkçe sesli okuma (varsa). force: sessiz modda bile (kullanıcı "Dinle"ye bastığında). */
+export function speak(text: string, force = false) {
+  if (!force && isMuted()) return;
   try {
     const s = window.speechSynthesis;
     if (!s) return;

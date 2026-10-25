@@ -1,8 +1,10 @@
 import { STEPS } from '../lib/counter';
 import { modPct, type Profile } from '../lib/store';
-import { COLORS, SUFFIX } from '../lib/theme';
+import { useState } from 'react';
+import { COLORS, SUFFIX, isMuted, setMuted } from '../lib/theme';
 
 export function Progress({ profile, onLogout }: { profile: Profile; onLogout: () => void }) {
+  const [muted, setM] = useState(isMuted());
   const goal = Math.floor(profile.stars / 10) * 10 + 10;
   return (
     <main className="screen">
@@ -31,7 +33,10 @@ export function Progress({ profile, onLogout }: { profile: Profile; onLogout: ()
           );
         })}
       </div>
-      <p className="hint">Yüzde, dersi bitirmeni ve sesli yolculukta ilerlemeni birlikte sayar.</p>
+      <p className="hint">Yüzde, dersi bitirmeni ve yolculukta 100'e (ya da ona en yakın sayıya) ulaşmanı birlikte sayar.</p>
+      <button className="ghost wide" aria-pressed={!muted} onClick={() => { setMuted(!muted); setM(!muted); }}>
+        Sesli övgüler: {muted ? 'Kapalı' : 'Açık'}
+      </button>
       <button className="ghost wide" onClick={onLogout}>Çıkış yap</button>
     </main>
   );

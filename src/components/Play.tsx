@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { STEPS } from '../lib/counter';
-import { SUFFIX, speak } from '../lib/theme';
+import { SUFFIX, praise, speak } from '../lib/theme';
 
 const COUNT = 10;
 
@@ -40,7 +40,12 @@ export function Play({ fixedStep, onExit, onFinish }: Props) {
   const check = () => {
     if (sel === null) return;
     setChecked(true);
-    if (sel === q.answer) setScore((s) => s + 1);
+    if (sel === q.answer) {
+      setScore((s) => s + 1);
+      speak(praise());
+    } else {
+      speak('Bir daha deneriz.');
+    }
   };
   const next = () => {
     if (idx + 1 >= COUNT) {

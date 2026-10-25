@@ -4,7 +4,7 @@ import { advance, lastStop } from '../lib/counter';
 import { parseTurkishNumbers } from '../lib/trNumbers';
 import { playPop } from '../lib/pop';
 import { useSpeech } from '../lib/useSpeech';
-import { COLORS, SUFFIX } from '../lib/theme';
+import { COLORS, SUFFIX, praise, speak } from '../lib/theme';
 
 interface Props { step: number; onExit: () => void; onBest: (n: number) => void }
 
@@ -24,6 +24,8 @@ export function Journey({ step, onExit, onBest }: Props) {
     if (progress > prev.current) {
       playPop(progress === last);
       onBest(progress);
+      if (progress === last) speak('Harika! Başardın!');
+      else if ((progress / step) % 5 === 0) speak(praise());
     }
     prev.current = progress;
   }, [progress, last]); // eslint-disable-line react-hooks/exhaustive-deps

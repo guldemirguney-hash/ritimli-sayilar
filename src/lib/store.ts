@@ -48,11 +48,14 @@ export function saveProfile(name: string, p: Profile) {
   write(PROF + name.toLocaleLowerCase('tr'), p);
 }
 
-export const LESSON_STEPS = 5;
+/** Bir modüldeki ders adımı sayısı: 100'e kadar olan tüm katlar (3'er için 33, 10'ar için 10). */
+export function lessonCount(step: number): number {
+  return lastStop(step) / step;
+}
 
 /** Modül yüzdesi: ders adımları ve yolculukta ulaşılan en uzak durağın ortalaması. */
 export function modPct(p: Profile, step: number): number {
   const m = p.mods[step];
   if (!m) return 0;
-  return Math.round(((m.lesson / LESSON_STEPS + m.best / lastStop(step)) / 2) * 100);
+  return Math.round(((Math.min(m.lesson, lessonCount(step)) / lessonCount(step) + m.best / lastStop(step)) / 2) * 100);
 }

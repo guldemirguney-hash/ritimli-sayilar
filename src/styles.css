@@ -167,3 +167,8 @@ button:focus-visible { outline: 4px solid var(--ink); outline-offset: 3px; }
 .version { margin: 0; text-align: center; font-size: 13px; color: var(--muted); }
 .tabbar { padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
 .cta:disabled { opacity: 0.5; }
+
+.voice { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 360px; }
+.voice-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.voice-btn { min-height: 48px; border: 3px solid var(--ink); border-radius: 16px; background: #fff; font-weight: 800; font-size: 16px; }
+.voice-btn.on { background: var(--yellow); }

@@ -1,10 +1,11 @@
 import { STEPS } from '../lib/counter';
 import { modPct, type Profile } from '../lib/store';
 import { useState } from 'react';
-import { COLORS, SUFFIX, isMuted, setMuted } from '../lib/theme';
+import { COLORS, SUFFIX, VOICE_STYLES, getVoiceStyle, isMuted, setMuted, setVoiceStyle, speak, type VoiceStyle } from '../lib/theme';
 
 export function Progress({ profile, onLogout }: { profile: Profile; onLogout: () => void }) {
   const [muted, setM] = useState(isMuted());
+  const [voice, setV] = useState<VoiceStyle>(getVoiceStyle());
   const goal = Math.floor(profile.stars / 10) * 10 + 10;
   return (
     <main className="screen">
@@ -34,6 +35,21 @@ export function Progress({ profile, onLogout }: { profile: Profile; onLogout: ()
         })}
       </div>
       <p className="hint">Yüzde, dersi bitirmeni ve yolculukta 100'e (ya da ona en yakın sayıya) ulaşmanı birlikte sayar.</p>
+      <section className="voice" aria-label="Ses karakteri">
+        <span className="row-label">Ses karakteri</span>
+        <div className="voice-row">
+          {(Object.keys(VOICE_STYLES) as VoiceStyle[]).map((k) => (
+            <button
+              key={k}
+              className={`voice-btn ${voice === k ? 'on' : ''}`}
+              aria-pressed={voice === k}
+              onClick={() => { setVoiceStyle(k); setV(k); speak('Merhaba! Hadi birlikte sayalım!', true); }}
+            >
+              {VOICE_STYLES[k].label}
+            </button>
+          ))}
+        </div>
+      </section>
       <button className="ghost wide" aria-pressed={!muted} onClick={() => { setMuted(!muted); setM(!muted); }}>
         Sesli övgüler: {muted ? 'Kapalı' : 'Açık'}
       </button>

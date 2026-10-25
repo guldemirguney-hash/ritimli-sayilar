@@ -21,3 +21,21 @@ export function playPop(final = false) {
     });
   } catch { /* ses yoksa sessiz geç */ }
 }
+
+/** Metronom tık sesi. */
+export function playTick(strong = false) {
+  try {
+    ctx ??= new AudioContext();
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.value = strong ? 880 : 620;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.3, t + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+    o.connect(g).connect(ctx.destination);
+    o.start(t);
+    o.stop(t + 0.1);
+  } catch { /* ses yoksa sessiz geç */ }
+}

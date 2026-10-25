@@ -2,7 +2,29 @@
 import { lastStop } from './counter';
 
 export interface ModProg { lesson: number; best: number }
-export interface Profile { stars: number; mods: Record<number, ModProg> }
+export interface Streak { last: string; count: number }
+export interface Profile {
+  stars: number;
+  xp: number;
+  streak: Streak;
+  mods: Record<number, ModProg>;
+  nodes: Record<string, number>; // "3:2" -> 1..3 yıldız
+  best: Record<string, number>;  // oyun türü -> en iyi doğru sayısı
+}
+export const emptyProfile = (): Profile => ({ stars: 0, xp: 0, streak: { last: '', count: 0 }, mods: {}, nodes: {}, best: {} });
+
+/** Yerel saate göre YYYY-AA-GG. */
+export function todayStr(d = new Date()): string {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+/** Günlük seri: aynı gün değişmez, ertesi gün artar, ara verilirse 1'e döner. */
+export function bumpStreak(s: Streak, today: string): Streak {
+  if (s.last === today) return s;
+  const [y, m, d] = today.split('-').map(Number);
+  const yesterday = todayStr(new Date(y, m - 1, d - 1));
+  return { last: today, count: s.last === yesterday ? s.count + 1 : 1 };
+}
 
 const USERS = 'rs.users';
 const CUR = 'rs.current';
@@ -42,7 +64,7 @@ export function logout() {
 }
 
 export function getProfile(name: string): Profile {
-  return read<Profile>(PROF + name.toLocaleLowerCase('tr'), { stars: 0, mods: {} });
+  return { ...emptyProfile(), ...read<Partial<Profile>>(PROF + name.toLocaleLowerCase('tr'), {}) };
 }
 export function saveProfile(name: string, p: Profile) {
   write(PROF + name.toLocaleLowerCase('tr'), p);
@@ -53,9 +75,10 @@ export function lessonCount(step: number): number {
   return lastStop(step) / step;
 }
 
-/** Modül yüzdesi: ders adımları ve yolculukta ulaşılan en uzak durağın ortalaması. */
+/** Modül yüzdesi: ders, yolculuk ve yol düğümlerinin (5) ortalaması. */
 export function modPct(p: Profile, step: number): number {
-  const m = p.mods[step];
-  if (!m) return 0;
-  return Math.round(((Math.min(m.lesson, lessonCount(step)) / lessonCount(step) + m.best / lastStop(step)) / 2) * 100);
+  const m = p.mods[step] ?? { lesson: 0, best: 0 };
+  const done = [1, 2, 3, 4, 5].filter((r) => (p.nodes[`${step}:${r}`] ?? 0) > 0).length;
+  const parts = [Math.min(m.lesson, lessonCount(step)) / lessonCount(step), m.best / lastStop(step), done / 5];
+  return Math.round((parts.reduce((a, b) => a + b, 0) / parts.length) * 100);
 }

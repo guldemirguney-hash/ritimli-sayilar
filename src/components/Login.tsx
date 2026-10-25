@@ -50,7 +50,7 @@ export function Login({ onLogin }: { onLogin: (name: string) => void }) {
         <button type="submit" className="cta wide">Hadi başlayalım</button>
         <p className="hint">İlk kez mi geldin? Takma adını ve gizli sayını yaz, hesabın kendiliğinden açılır.</p>
       </form>
-      <p className="version">Sürüm 0.3</p>
+      <p className="version">Sürüm 0.4</p>
     </main>
   );
 }
